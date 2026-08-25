@@ -20,6 +20,7 @@ import { ConditionCard } from "@/components/vehicle/condition-card";
 import { MaintenanceHistory } from "@/components/vehicle/maintenance-history";
 import { RecommendedAction } from "@/components/vehicle/recommended-action";
 import { WhatIfSimulator } from "@/components/vehicle/what-if-simulator";
+import { StrategyComparison } from "@/components/vehicle/strategy-comparison";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -241,6 +242,9 @@ function VehicleDetailPage() {
 
         {/* What-If Scenario Sandbox */}
         <WhatIfSimulator vehicle={enriched ?? vehicle} />
+
+        {/* 3-Way Strategy Comparison Decision Engine */}
+        <StrategyComparison vehicle={enriched ?? vehicle} />
       </section>
 
       {
