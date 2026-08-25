@@ -2,6 +2,7 @@ const Vehicle = require('../models/Vehicle');
 const { scoreVehicle }             = require('../lib/riskEngine');
 const { buildExplanation }         = require('../lib/explainEngine');
 const { predictVehicleRiskWithML } = require('../lib/mlService');
+const { simulateWhatIf }           = require('../lib/simulationEngine');
 
 /**
  * GET /api/vehicles
@@ -133,6 +134,25 @@ exports.getAllRiskScores = async (req, res, next) => {
     };
 
     return res.json({ summary, vehicles: scores, computedAt: new Date().toISOString() });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/**
+ * POST /api/vehicles/:id/simulate
+ * Runs counterfactual what-if simulation on a single vehicle.
+ */
+exports.simulateVehicleRisk = async (req, res, next) => {
+  try {
+    const vehicle = await Vehicle.findOne({ id: req.params.id });
+    if (!vehicle) {
+      return res.status(404).json({ error: 'Vehicle not found' });
+    }
+
+    const simulationParams = req.body || {};
+    const result = simulateWhatIf(vehicle.toObject(), simulationParams);
+    return res.json(result);
   } catch (err) {
     return next(err);
   }

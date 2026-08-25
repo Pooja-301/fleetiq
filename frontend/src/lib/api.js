@@ -49,3 +49,15 @@ export function askCopilot(message) {
     body: JSON.stringify({ message }),
   });
 }
+
+/**
+ * POST /api/vehicles/:id/simulate
+ * What-If Counterfactual Simulation
+ */
+export function simulateVehicleRisk(id, params = {}) {
+  return apiFetch(`/api/vehicles/${encodeURIComponent(id)}/simulate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+}

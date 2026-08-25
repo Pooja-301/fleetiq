@@ -19,6 +19,7 @@ import { AiExplanation } from "@/components/vehicle/ai-explanation";
 import { ConditionCard } from "@/components/vehicle/condition-card";
 import { MaintenanceHistory } from "@/components/vehicle/maintenance-history";
 import { RecommendedAction } from "@/components/vehicle/recommended-action";
+import { WhatIfSimulator } from "@/components/vehicle/what-if-simulator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -237,6 +238,9 @@ function VehicleDetailPage() {
           <AiExplanation vehicle={enriched ?? vehicle} />
           <RecommendedAction vehicle={enriched ?? vehicle} />
         </div>
+
+        {/* What-If Scenario Sandbox */}
+        <WhatIfSimulator vehicle={enriched ?? vehicle} />
       </section>
 
       {
