@@ -1,0 +1,7 @@
+﻿node_modules/
+.env
+v0-export/
+dist/
+build/
+.DS_Store
+*.log
