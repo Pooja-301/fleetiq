@@ -29,6 +29,13 @@ function VehicleTable({ compact = false }) {
       .catch(() => {});
   }, []);
 
+  const [page, setPage] = React.useState(1);
+  const pageSize = compact ? 5 : 10;
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [query, risk, sortKey]);
+
   const rows = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     return dataVehicles.filter((v) => {
@@ -41,7 +48,9 @@ function VehicleTable({ compact = false }) {
       return a.id.localeCompare(b.id);
     });
   }, [dataVehicles, query, risk, sortKey]);
-  const visible = compact ? rows.slice(0, 5) : rows;
+
+  const totalPages = Math.ceil(rows.length / pageSize) || 1;
+  const visible = compact ? rows.slice(0, 5) : rows.slice((page - 1) * pageSize, page * pageSize);
   return <Card>
       <CardHeader className="gap-3">
         <div className="flex flex-wrap items-start gap-3">
@@ -182,6 +191,38 @@ function VehicleTable({ compact = false }) {
             </TableBody>
           </Table>
         </div>
+
+        {!compact && rows.length > pageSize && (
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t text-xs text-muted-foreground">
+            <span>
+              Showing <strong>{(page - 1) * pageSize + 1}</strong> to <strong>{Math.min(page * pageSize, rows.length)}</strong> of <strong>{rows.length.toLocaleString()}</strong> vehicles
+            </span>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="h-8 px-3 text-xs"
+              >
+                Previous
+              </Button>
+              <span className="px-2 text-foreground font-medium">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="h-8 px-3 text-xs"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>;
 }

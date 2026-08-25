@@ -25,29 +25,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { formatDate, formatKm, getVehicle, relativeTime } from "@/lib/fleet-data";
-import { fetchVehicleRisk } from "@/lib/api";
-
-const severityMeta = {
-  critical: { variant: "danger", dot: "bg-destructive", label: "Critical" },
-  warning: { variant: "warning", dot: "bg-warning", label: "Warning" },
-  info: { variant: "muted", dot: "bg-primary", label: "Info" }
-};
+import { fetchVehicleRisk, fetchVehicle } from "@/lib/api";
 
 function VehicleDetailPage() {
   const { id } = useParams();
-  const vehicle = id ? getVehicle(id) : undefined;
-
-  // Live risk data from backend
+  const mockFallback = id ? getVehicle(id) : undefined;
+  const [vehicleData, setVehicleData] = useState(mockFallback || null);
   const [liveRisk, setLiveRisk] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
+
+    fetchVehicle(id)
+      .then((data) => {
+        if (data) setVehicleData(data);
+      })
+      .catch(() => {
+        if (mockFallback) setVehicleData(mockFallback);
+      })
+      .finally(() => setLoading(false));
+
     fetchVehicleRisk(id)
       .then(setLiveRisk)
-      .catch(() => setLiveRisk(null)); // silent fallback to mock data
+      .catch(() => setLiveRisk(null));
   }, [id]);
 
-  // Merge live risk into vehicle — override only risk fields, keep all mock UI data
+  const vehicle = vehicleData;
+
+  // Merge live risk into vehicle
   const enriched = vehicle && liveRisk
     ? {
         ...vehicle,
