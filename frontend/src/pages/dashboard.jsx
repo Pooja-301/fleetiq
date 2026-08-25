@@ -1,4 +1,5 @@
-import { AlertTriangle, Gauge, ShieldCheck, Truck } from "lucide-react";
+import { useState, useEffect } from "react";
+import { AlertTriangle, Gauge, ShieldCheck, Truck, Zap } from "lucide-react";
 import { HealthScoreRing } from "@/components/dashboard/health-score-ring";
 import { HealthTrendChart } from "@/components/dashboard/health-trend-chart";
 import { PriorityAlerts } from "@/components/dashboard/priority-alerts";
@@ -8,11 +9,47 @@ import { VehicleHealthSummary } from "@/components/dashboard/vehicle-health-summ
 import { VehicleTable } from "@/components/dashboard/vehicle-table";
 import { AppShell } from "@/components/layout/app-shell";
 import { Card } from "@/components/ui/card";
-import { fleetSummary } from "@/lib/fleet-data";
+import { fleetSummary as mockSummary } from "@/lib/fleet-data";
+import { fetchAllRiskScores } from "@/lib/api";
+
 function DashboardPage() {
-  const { deltas } = fleetSummary;
-  const scoreDelta = +(fleetSummary.fleetHealthScore - fleetSummary.previousHealthScore).toFixed(1);
-  return <AppShell title="Fleet Overview" description="Predictive health and maintenance posture across all depots">
+  const [summary, setSummary] = useState(mockSummary);
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    fetchAllRiskScores()
+      .then((res) => {
+        if (res && res.summary) {
+          setSummary((prev) => ({
+            ...prev,
+            totalVehicles: res.summary.total,
+            healthyVehicles: res.summary.low,
+            mediumRisk: res.summary.medium,
+            highRisk: res.summary.high,
+            fleetHealthScore: Math.round(100 - res.summary.avgRisk),
+          }));
+          setIsLive(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const { deltas } = summary;
+  const scoreDelta = +(summary.fleetHealthScore - summary.previousHealthScore).toFixed(1);
+  return <AppShell
+    title="Fleet Overview"
+    description={
+      <span className="flex items-center gap-2">
+        <span>Predictive health and maintenance posture across all depots</span>
+        {isLive && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold text-green-600 dark:text-green-400">
+            <Zap className="size-2.5" />
+            LIVE BACKEND
+          </span>
+        )}
+      </span>
+    }
+  >
       {
     /* KPI row */
   }

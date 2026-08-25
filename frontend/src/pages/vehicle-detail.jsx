@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -8,7 +9,8 @@ import {
   Gauge,
   MapPin,
   TriangleAlert,
-  User
+  User,
+  Zap
 } from "lucide-react";
 import { HealthScoreRing } from "@/components/dashboard/health-score-ring";
 import { RiskBadge } from "@/components/dashboard/risk-badge";
@@ -23,14 +25,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { formatDate, formatKm, getVehicle, relativeTime } from "@/lib/fleet-data";
+import { fetchVehicleRisk } from "@/lib/api";
+
 const severityMeta = {
   critical: { variant: "danger", dot: "bg-destructive", label: "Critical" },
   warning: { variant: "warning", dot: "bg-warning", label: "Warning" },
   info: { variant: "muted", dot: "bg-primary", label: "Info" }
 };
+
 function VehicleDetailPage() {
   const { id } = useParams();
   const vehicle = id ? getVehicle(id) : undefined;
+
+  // Live risk data from backend
+  const [liveRisk, setLiveRisk] = useState(null);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchVehicleRisk(id)
+      .then(setLiveRisk)
+      .catch(() => setLiveRisk(null)); // silent fallback to mock data
+  }, [id]);
+
+  // Merge live risk into vehicle — override only risk fields, keep all mock UI data
+  const enriched = vehicle && liveRisk
+    ? {
+        ...vehicle,
+        riskLevel:       liveRisk.riskLevel,
+        riskProbability: liveRisk.riskProbability,
+        explanation:     liveRisk.explanation,
+        recommendation:  liveRisk.recommendation,
+      }
+    : vehicle;
   if (!vehicle) {
     return <AppShell title="Vehicle not found">
         <Card>
@@ -50,7 +76,7 @@ function VehicleDetailPage() {
         </Card>
       </AppShell>;
   }
-  const riskPct = Math.round(vehicle.riskProbability * 100);
+  const riskPct = Math.round((enriched ?? vehicle).riskProbability * 100);
   const overdue = vehicle.nextMaintenanceIn.toLowerCase().startsWith("overdue");
   const facts = [
     { icon: MapPin, label: "Depot", value: vehicle.depot },
@@ -60,7 +86,8 @@ function VehicleDetailPage() {
     { icon: Droplets, label: "Utilisation", value: `${vehicle.utilisation}%` },
     { icon: CalendarClock, label: "In service since", value: formatDate(vehicle.inServiceSince) }
   ];
-  return <AppShell title={vehicle.name} description={`${vehicle.id} \xB7 ${vehicle.plate} \xB7 ${vehicle.type}`}>
+  return <AppShell title={vehicle.name} description={`${vehicle.id} · ${vehicle.plate} · ${vehicle.type}`}>
+
       {
     /* Back link + title block */
   }
@@ -73,7 +100,7 @@ function VehicleDetailPage() {
         </Button>
         <Separator orientation="vertical" className="hidden h-4 sm:block" />
         <div className="flex flex-wrap items-center gap-2">
-          <RiskBadge level={vehicle.riskLevel} />
+          <RiskBadge level={(enriched ?? vehicle).riskLevel} />
           {overdue ? <Badge variant="danger">
               <CalendarClock />
               {vehicle.nextMaintenanceIn}
@@ -190,12 +217,18 @@ function VehicleDetailPage() {
     /* AI explanation + recommended action */
   }
       <section aria-labelledby="ai-heading" className="flex flex-col gap-4">
-        <h2 id="ai-heading" className="text-sm font-semibold tracking-tight">
+        <h2 id="ai-heading" className="flex items-center gap-2 text-sm font-semibold tracking-tight">
           Predictive assessment
+          {liveRisk && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold text-green-600 dark:text-green-400">
+              <Zap className="size-2.5" />
+              LIVE
+            </span>
+          )}
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <AiExplanation vehicle={vehicle} />
-          <RecommendedAction vehicle={vehicle} />
+          <AiExplanation vehicle={enriched ?? vehicle} />
+          <RecommendedAction vehicle={enriched ?? vehicle} />
         </div>
       </section>
 

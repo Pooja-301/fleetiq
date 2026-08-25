@@ -323,7 +323,9 @@ app.get('/api/pubchem', apiController.getPubChem);
 app.get('/api/wikipedia', apiController.getWikipedia);
 app.get('/api/giphy', apiController.getGiphy);
 app.get('/api/vehicles', vehiclesController.getVehicles);
+app.get('/api/vehicles/risk/all', vehiclesController.getAllRiskScores);
 app.get('/api/vehicles/:id', vehiclesController.getVehicle);
+app.get('/api/vehicles/:id/risk', vehiclesController.getVehicleRisk);
 
 /**
  * AI Integrations and Boilerplate example routes.

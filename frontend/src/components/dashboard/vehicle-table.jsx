@@ -8,14 +8,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatDate, formatKm, vehicles } from "@/lib/fleet-data";
+import { formatDate, formatKm, vehicles as mockVehicles } from "@/lib/fleet-data";
+import { fetchVehicles } from "@/lib/api";
+
 function VehicleTable({ compact = false }) {
+  const [dataVehicles, setDataVehicles] = React.useState(mockVehicles);
+  const [isLive, setIsLive] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const [risk, setRisk] = React.useState("all");
   const [sortKey, setSortKey] = React.useState("healthScore");
+
+  React.useEffect(() => {
+    fetchVehicles()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDataVehicles(data);
+          setIsLive(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const rows = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    return vehicles.filter((v) => {
+    return dataVehicles.filter((v) => {
       const matchesRisk = risk === "all" || v.riskLevel === risk;
       const matchesQuery = !q || v.id.toLowerCase().includes(q) || v.name.toLowerCase().includes(q) || v.type.toLowerCase().includes(q) || v.plate.toLowerCase().includes(q);
       return matchesRisk && matchesQuery;
@@ -24,7 +40,7 @@ function VehicleTable({ compact = false }) {
       if (sortKey === "mileage") return b.mileage - a.mileage;
       return a.id.localeCompare(b.id);
     });
-  }, [query, risk, sortKey]);
+  }, [dataVehicles, query, risk, sortKey]);
   const visible = compact ? rows.slice(0, 5) : rows;
   return <Card>
       <CardHeader className="gap-3">
@@ -32,7 +48,7 @@ function VehicleTable({ compact = false }) {
           <div className="flex min-w-0 flex-col gap-1">
             <CardTitle>Fleet vehicles</CardTitle>
             <CardDescription>
-              {compact ? "Highest-risk vehicles first" : `${rows.length} of ${vehicles.length} vehicles shown`}
+              {compact ? "Highest-risk vehicles first" : `${rows.length} of ${dataVehicles.length} vehicles shown`}
             </CardDescription>
           </div>
 
