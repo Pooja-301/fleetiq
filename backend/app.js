@@ -156,10 +156,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash);
 app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/ai/llm-camera') {
-    // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
-    // WARN: Any path that is not protected by CSRF here should have lusca.csrf() chained
-    // in their route handler.
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path === '/api/upload' || req.path === '/ai/llm-camera') {
+    // API endpoints and multipart uploads do not require CSRF token
     next();
   } else {
     lusca.csrf()(req, res, next);
