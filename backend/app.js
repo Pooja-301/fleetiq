@@ -333,8 +333,9 @@ app.get('/api/wikipedia', apiController.getWikipedia);
 app.get('/api/giphy', apiController.getGiphy);
 app.get('/api/vehicles', vehiclesController.getVehicles);
 app.get('/api/vehicles/risk/all', vehiclesController.getAllRiskScores);
-app.get('/api/vehicles/:id', vehiclesController.getVehicle);
 app.get('/api/vehicles/:id/risk', vehiclesController.getVehicleRisk);
+app.get('/api/vehicles/:id', vehiclesController.getVehicle);
+app.get('/api/substitutes/:id', vehiclesController.getSubstitutes);
 app.post('/api/vehicles/:id/simulate', vehiclesController.simulateVehicleRisk);
 app.post('/api/copilot/chat', copilotController.chat);
 

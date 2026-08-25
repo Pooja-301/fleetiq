@@ -157,3 +157,62 @@ exports.simulateVehicleRisk = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/vehicles/:id/substitutes
+ * Finds compatible healthy substitute vehicles to take over route assignments.
+ */
+exports.getSubstitutes = async (req, res, next) => {
+  try {
+    const target = await Vehicle.findOne({ id: req.params.id });
+    if (!target) {
+      return res.status(404).json({ error: 'Vehicle not found' });
+    }
+
+    // Query candidates: same type, low/medium risk, healthScore >= 70, not target
+    const candidates = await Vehicle.find({
+      id: { $ne: target.id },
+      type: target.type,
+      healthScore: { $gte: 70 },
+      riskLevel: { $in: ['low', 'medium'] }
+    }).limit(30);
+
+    // Score and rank candidates by depot proximity & health
+    const targetDepot = (target.depot || '').toLowerCase();
+    const scored = candidates.map((cand) => {
+      const candDepot = (cand.depot || '').toLowerCase();
+      const isSameDepot = candDepot.length > 0 && candDepot === targetDepot;
+      let matchScore = 75;
+      if (isSameDepot) matchScore += 18;
+      if ((cand.healthScore || 0) >= 85) matchScore += 5;
+      if (!cand.alerts || cand.alerts.length === 0) matchScore += 2;
+
+      return {
+        id: cand.id,
+        name: cand.name || 'Commercial Fleet Unit',
+        type: cand.type || target.type,
+        plate: cand.plate || 'MH 12 QA 1000',
+        depot: cand.depot || 'Regional Depot Hub',
+        driver: cand.driver || 'Assigned Depot Driver',
+        healthScore: cand.healthScore || 80,
+        riskLevel: cand.riskLevel || 'low',
+        mileage: cand.mileage || 150000,
+        isSameDepot,
+        matchScore: Math.min(99, matchScore),
+        status: 'Available for Dispatch',
+      };
+    }).sort((a, b) => {
+      if (a.isSameDepot !== b.isSameDepot) return b.isSameDepot - a.isSameDepot;
+      return b.healthScore - a.healthScore;
+    }).slice(0, 4);
+
+    return res.json({
+      targetVehicleId: target.id,
+      targetType: target.type,
+      targetDepot: target.depot,
+      substitutes: scored,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};

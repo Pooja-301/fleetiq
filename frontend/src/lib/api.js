@@ -61,3 +61,11 @@ export function simulateVehicleRisk(id, params = {}) {
     body: JSON.stringify(params),
   });
 }
+
+/**
+ * GET /api/substitutes/:id
+ * Queries matching healthy substitute vehicles for route takeover
+ */
+export function fetchVehicleSubstitutes(id) {
+  return apiFetch(`/api/substitutes/${encodeURIComponent(id)}`);
+}
