@@ -4,6 +4,7 @@ import {
   ChartNoAxesCombined,
   LayoutDashboard,
   Settings,
+  SlidersHorizontal,
   Sparkles,
   Truck,
   Wrench,
@@ -17,6 +18,7 @@ import { fleetSummary, priorityAlerts } from "@/lib/fleet-data";
 const navigation = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
   { label: "Vehicles", to: "/vehicles", icon: Truck, meta: String(fleetSummary.totalVehicles) },
+  { label: "Simulation & Decisions", to: "/simulation", icon: SlidersHorizontal, meta: "AI", metaTone: "primary" },
   { label: "Maintenance", to: "/maintenance", icon: Wrench, meta: "8" },
   {
     label: "Alerts",

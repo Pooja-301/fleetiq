@@ -5,6 +5,7 @@ import DashboardPage from "@/pages/dashboard"
 import SectionPlaceholder from "@/pages/section-placeholder"
 import VehicleDetailPage from "@/pages/vehicle-detail"
 import VehiclesPage from "@/pages/vehicles"
+import SimulationPage from "@/pages/simulation"
 import CopilotPage from "@/pages/copilot"
 import MaintenancePage from "@/pages/maintenance"
 import AlertsPage from "@/pages/alerts"
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/vehicles" element={<VehiclesPage />} />
       <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
+      <Route path="/simulation" element={<SimulationPage />} />
 
       <Route path="/maintenance" element={<MaintenancePage />} />
       <Route path="/alerts" element={<AlertsPage />} />
