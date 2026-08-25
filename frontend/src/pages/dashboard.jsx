@@ -66,41 +66,41 @@ function DashboardPage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <StatCard
-    label="Total Vehicles"
-    value={String(fleetSummary.totalVehicles)}
-    icon={Truck}
-    delta={deltas.total}
-    hint={`${fleetSummary.activeToday} active today \xB7 ${fleetSummary.inWorkshop} in workshop`}
-  />
+            label="Total Vehicles"
+            value={String(summary.totalVehicles)}
+            icon={Truck}
+            delta={deltas.total}
+            hint={`${summary.activeToday} active today · ${summary.inWorkshop} in workshop`}
+          />
           <StatCard
-    label="Healthy Vehicles"
-    value={String(fleetSummary.healthyVehicles)}
-    icon={ShieldCheck}
-    tone="success"
-    delta={deltas.healthy}
-    hint={`${Math.round(fleetSummary.healthyVehicles / fleetSummary.totalVehicles * 100)}% of fleet at score 80+`}
-  />
+            label="Healthy Vehicles"
+            value={String(summary.healthyVehicles)}
+            icon={ShieldCheck}
+            tone="success"
+            delta={deltas.healthy}
+            hint={`${Math.round((summary.healthyVehicles / (summary.totalVehicles || 1)) * 100)}% of fleet at score 80+`}
+          />
           <StatCard
-    label="Medium Risk"
-    value={String(fleetSummary.mediumRisk)}
-    icon={Gauge}
-    tone="warning"
-    delta={deltas.medium}
-    invertDelta
-    hint="Monitor — service window within 30 days"
-  />
+            label="Medium Risk"
+            value={String(summary.mediumRisk)}
+            icon={Gauge}
+            tone="warning"
+            delta={deltas.medium}
+            invertDelta
+            hint="Monitor — service window within 30 days"
+          />
           <StatCard
-    label="High Risk"
-    value={String(fleetSummary.highRisk)}
-    icon={AlertTriangle}
-    tone="danger"
-    delta={deltas.high}
-    invertDelta
-    hint="Requires intervention this week"
-  />
+            label="High Risk"
+            value={String(summary.highRisk)}
+            icon={AlertTriangle}
+            tone="danger"
+            delta={deltas.high}
+            invertDelta
+            hint="Requires intervention this week"
+          />
 
           <Card className="flex flex-row items-center gap-4 p-5 sm:col-span-2 xl:col-span-1">
-            <HealthScoreRing score={Math.round(fleetSummary.fleetHealthScore)} size={92} strokeWidth={8} />
+            <HealthScoreRing score={Math.round(summary.fleetHealthScore)} size={92} strokeWidth={8} />
             <div className="flex min-w-0 flex-col gap-1">
               <span className="text-muted-foreground text-xs font-medium">Fleet Health Score</span>
               <span className="tabular text-success text-sm font-semibold">
