@@ -5,8 +5,8 @@
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
-async function apiFetch(path) {
-  const res = await fetch(`${BASE}${path}`);
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${BASE}${path}`, options);
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(`API ${path} → ${res.status}: ${text}`);
@@ -36,4 +36,16 @@ export function fetchVehicleRisk(id) {
 /** GET /api/vehicles/risk/all — fleet-wide risk summary */
 export function fetchAllRiskScores() {
   return apiFetch('/api/vehicles/risk/all');
+}
+
+/**
+ * POST /api/copilot/chat
+ * Natural language fleet queries
+ */
+export function askCopilot(message) {
+  return apiFetch('/api/copilot/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  });
 }

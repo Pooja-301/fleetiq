@@ -89,6 +89,7 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const vehiclesController = require('./controllers/vehicles');
+const copilotController = require('./controllers/copilot');
 const aiController = require('./controllers/ai');
 const aiAgentController = require('./controllers/ai-agent');
 
@@ -326,6 +327,7 @@ app.get('/api/vehicles', vehiclesController.getVehicles);
 app.get('/api/vehicles/risk/all', vehiclesController.getAllRiskScores);
 app.get('/api/vehicles/:id', vehiclesController.getVehicle);
 app.get('/api/vehicles/:id/risk', vehiclesController.getVehicleRisk);
+app.post('/api/copilot/chat', copilotController.chat);
 
 /**
  * AI Integrations and Boilerplate example routes.

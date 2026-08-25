@@ -5,6 +5,9 @@ import DashboardPage from "@/pages/dashboard"
 import SectionPlaceholder from "@/pages/section-placeholder"
 import VehicleDetailPage from "@/pages/vehicle-detail"
 import VehiclesPage from "@/pages/vehicles"
+import CopilotPage from "@/pages/copilot"
+import MaintenancePage from "@/pages/maintenance"
+import AlertsPage from "@/pages/alerts"
 
 export default function App() {
   return (
@@ -14,22 +17,8 @@ export default function App() {
       <Route path="/vehicles" element={<VehiclesPage />} />
       <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
 
-      <Route
-        path="/maintenance"
-        element={
-          <SectionPlaceholder
-            title="Maintenance"
-            description="Service scheduling and workshop capacity"
-            icon={Wrench}
-          />
-        }
-      />
-      <Route
-        path="/alerts"
-        element={
-          <SectionPlaceholder title="Alerts" description="Fleet-wide alert inbox and routing rules" icon={BellRing} />
-        }
-      />
+      <Route path="/maintenance" element={<MaintenancePage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
       <Route
         path="/analytics"
         element={
@@ -40,16 +29,7 @@ export default function App() {
           />
         }
       />
-      <Route
-        path="/copilot"
-        element={
-          <SectionPlaceholder
-            title="AI Copilot"
-            description="Ask questions about fleet health and maintenance"
-            icon={Sparkles}
-          />
-        }
-      />
+      <Route path="/copilot" element={<CopilotPage />} />
       <Route
         path="/settings"
         element={
